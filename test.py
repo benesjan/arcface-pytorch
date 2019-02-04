@@ -11,7 +11,7 @@ from models import *
 import torch
 import numpy as np
 import time
-from config import Config
+from config.config import Config
 from torch.nn import DataParallel
 
 
@@ -61,7 +61,7 @@ def get_featurs(model, test_list, batch_size=10):
             cnt += 1
 
             data = torch.from_numpy(images)
-            data = data.to(torch.device("cuda"))
+            data = data.to(opt.device)
             output = model(data)
             output = output.data.cpu().numpy()
 
@@ -160,15 +160,11 @@ if __name__ == '__main__':
 
     model = DataParallel(model)
     # load_model(model, opt.test_model_path)
-    model.load_state_dict(torch.load(opt.test_model_path))
-    model.to(torch.device("cuda"))
+    model.load_state_dict(torch.load(opt.test_model_path, map_location=opt.device))
+    model.to(opt.device)
 
     identity_list = get_lfw_list(opt.lfw_test_list)
     img_paths = [os.path.join(opt.lfw_root, each) for each in identity_list]
 
     model.eval()
     lfw_test(model, img_paths, identity_list, opt.lfw_test_list, opt.test_batch_size)
-
-
-
-

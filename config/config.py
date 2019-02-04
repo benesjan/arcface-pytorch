@@ -1,3 +1,6 @@
+import torch
+
+
 class Config(object):
     env = 'default'
     backbone = 'resnet18'
@@ -18,8 +21,8 @@ class Config(object):
     test_root = '/data1/Datasets/anti-spoofing/test/data_align_256'
     test_list = 'test.txt'
 
-    lfw_root = '/data/Datasets/lfw/lfw-align-128'
-    lfw_test_list = '/data/Datasets/lfw/lfw_test_pair.txt'
+    lfw_root = 'data/Datasets/lfw/lfw-align-128'
+    lfw_test_list = 'data/Datasets/lfw/lfw_test_pair.txt'
 
     checkpoints_path = 'checkpoints'
     load_model_path = 'models/resnet18.pth'
@@ -33,8 +36,9 @@ class Config(object):
 
     optimizer = 'sgd'
 
-    use_gpu = True  # use GPU or not
-    gpu_id = '0, 1'
+    # device = torch.device("cuda")
+    device = torch.device("cpu")
+
     num_workers = 4  # how many workers for loading data
     print_freq = 100  # print info every N batch
 

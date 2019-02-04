@@ -11,7 +11,7 @@ import torch
 import numpy as np
 import random
 import time
-from config import Config
+from config.config import Config
 from torch.nn import DataParallel
 from torch.optim.lr_scheduler import StepLR
 from test import *
@@ -28,7 +28,6 @@ if __name__ == '__main__':
     opt = Config()
     if opt.display:
         visualizer = Visualizer()
-    device = torch.device("cuda")
 
     train_dataset = Dataset(opt.train_root, opt.train_list, phase='train', input_shape=opt.input_shape)
     trainloader = data.DataLoader(train_dataset,
@@ -64,9 +63,9 @@ if __name__ == '__main__':
 
     # view_model(model, opt.input_shape)
     print(model)
-    model.to(device)
+    model.to(opt.device)
     model = DataParallel(model)
-    metric_fc.to(device)
+    metric_fc.to(opt.device)
     metric_fc = DataParallel(metric_fc)
 
     if opt.optimizer == 'sgd':
@@ -84,8 +83,8 @@ if __name__ == '__main__':
         model.train()
         for ii, data in enumerate(trainloader):
             data_input, label = data
-            data_input = data_input.to(device)
-            label = label.to(device).long()
+            data_input = data_input.to(opt.device)
+            label = label.to(opt.device).long()
             feature = model(data_input)
             output = metric_fc(feature, label)
             loss = criterion(output, label)
@@ -104,7 +103,8 @@ if __name__ == '__main__':
                 acc = np.mean((output == label).astype(int))
                 speed = opt.print_freq / (time.time() - start)
                 time_str = time.asctime(time.localtime(time.time()))
-                print('{} train epoch {} iter {} {} iters/s loss {} acc {}'.format(time_str, i, ii, speed, loss.item(), acc))
+                print('{} train epoch {} iter {} {} iters/s loss {} acc {}'.format(time_str, i, ii, speed, loss.item(),
+                                                                                   acc))
                 if opt.display:
                     visualizer.display_current_results(iters, loss.item(), name='train_loss')
                     visualizer.display_current_results(iters, acc, name='train_acc')
